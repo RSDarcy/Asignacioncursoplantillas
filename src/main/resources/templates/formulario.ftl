@@ -7,7 +7,7 @@
 <h1>Procesando Formulario</h1>
 <table>
     <tbody>
-    <tr><td>Usuario</td><td>${user.usuario}</td></tr>
+    <tr><td>Usuario</td><td>${usuario}</td></tr>
     </tbody>
 </table>
 </body>

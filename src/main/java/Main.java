@@ -2,6 +2,7 @@
 
 import freemarker.template.Configuration;
 import spark.ModelAndView;
+import spark.Session;
 import spark.Spark;
 import spark.template.freemarker.FreeMarkerEngine;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
@@ -71,11 +72,27 @@ public class Main {
             attributes.put("usuario", usuario);
             System.out.println(usuario);
             System.out.println(contrasena);
-            System.out.println(attributes);
             return new ModelAndView(attributes, "formulario.ftl");
         }, freeMarkerEngine);
 
+        get("/autenticar", (request, response)->{
+            //
+            Session session=request.session(true);
 
+            //
+            //Usuario usuario= null;//FakeServices.getInstancia().autenticarUsuario(request.params("usuario"), request.params("contrasena"));
+            if(request.params("usuario").equalsIgnoreCase("moxy") && request.params("contrasena").equalsIgnoreCase("2014")){
+                //Buscar el usuario en la base de datos..
+                //usuario = new Usuario("Barcamp", "2014");
+                //session.attribute("usuario", user);
+                //redireccionado a la otra URL.
+                response.redirect("/hello");
+            }else{
+                halt(401,"Credenciales no validas...");
+            }
+
+            return "";
+        });
 
 
     }
