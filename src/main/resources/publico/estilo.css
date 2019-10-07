@@ -1,0 +1,22 @@
+#logih1{
+    color: #000072;
+    font-size: 25px;
+    font-style: italic;
+}
+
+h1{
+    color: blue;
+}
+
+.barcamp{
+    text-align: center;
+    color: blue;
+
+}
+
+body{
+    background-image: url('/images/user.png');
+    background-image: url('/images/password.png');
+    background-repeat: no-repeat;
+    background-position: 200px 50px;
+}
