@@ -1,53 +1,47 @@
 
 
 import freemarker.template.Configuration;
+import freemarker.template.Template;
+
 import spark.ModelAndView;
 import spark.Session;
 import spark.Spark;
-import spark.template.freemarker.FreeMarkerEngine;
-import spark.template.thymeleaf.ThymeleafTemplateEngine;
+import static spark.Spark.staticFiles;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.io.StringWriter;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static spark.Spark.*;
 
 
 public class Main {
 
-
-
-    /*public static String renderFreemarker(Map<String, Object> model, String templatePath) {
-        Configuration configuration=new Configuration(Configuration.VERSION_2_3_23);
-        configuration.setClassForTemplateLoading(Main.class, "/resources/templates/");
-        FreeMarkerEngine freeMarkerEngine = new FreeMarkerEngine(configuration);
-        return freeMarkerEngine.render(new ModelAndView(model, templatePath));*/
-
-
-    // Declaración para simplificar el uso del motor de template Thymeleaf.
-    public static String renderThymeleaf(Map<String, Object> model, String templatePath) {
-        return new ThymeleafTemplateEngine().render(new ModelAndView(model, templatePath)); }
-
     public static void main(String[] args){
+        staticFiles.location("/templates");
         Configuration configuration=new Configuration(Configuration.getVersion());
-        configuration.setClassForTemplateLoading(Main.class, "/templates");
-        FreeMarkerEngine freeMarkerEngine = new FreeMarkerEngine(configuration);
+        configuration.setClassForTemplateLoading(Main.class, "/");
 
         Spark.get("/login", (request, response) -> {
             Map<String, Object> attributes = new HashMap<>();
             attributes.put("titulo", "Login");
             return new ModelAndView(attributes, "login.ftl");
-        }, freeMarkerEngine);
-        /*Configuration configuration=new Configuration(Configuration.VERSION_2_3_23);
-        configuration.setClassForTemplateLoading(Main.class, "/resources/templates/");
-        FreeMarkerEngine freeMarkerEngine = new FreeMarkerEngine(configuration);
-*/
+        });
 
-        get("/hello", (req, res) -> "Hello World");
+        ///Creo que fuera de funciones fuera mejor tenerlo definido
+        AtomicReference<Usuario> user = new AtomicReference<>(new Usuario());
 
-        //get("/formulario/", Main::handle);
 
+        Spark.get("/login", (request, response) -> {
+            Template inicio = configuration.getTemplate("templates/login.ftl");
+            StringWriter writer = new StringWriter();
+
+            Map<String, Object> attributes = new HashMap<>();
+            attributes.put("user", user);
+            inicio.process(attributes, writer);
+            return writer;
+        });
 
 
         before("/",(request, response) -> {
@@ -60,7 +54,23 @@ public class Main {
                 ;
             }
         });
-        post("/procesarFormulario", (request, response) -> {
+
+        Spark.post("/procesarFormulario", (request, response) -> {
+            //obteniendo la matricula.
+
+            String usuario =request.queryParams("usuario");
+            String contrasena =request.queryParams("contrasena");
+
+            user.set(new Usuario(usuario, contrasena));
+            Map<String, Object> attributes = new HashMap<>();
+            attributes.put("titulo", "Completo");
+            attributes.put("usuario", usuario);
+            System.out.println(usuario);
+            System.out.println(contrasena);
+            return new ModelAndView(attributes, "formulario.ftl");
+        });
+
+        /*post("/procesarFormulario", (request, response) -> {
             //obteniendo la matricula.
 
             String usuario =request.queryParams("usuario");
@@ -73,7 +83,7 @@ public class Main {
             System.out.println(usuario);
             System.out.println(contrasena);
             return new ModelAndView(attributes, "formulario.ftl");
-        }, freeMarkerEngine);
+        }, freeMarkerEngine);*/
 
         get("/autenticar", (request, response)->{
             //
